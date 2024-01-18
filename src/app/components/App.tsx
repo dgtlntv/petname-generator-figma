@@ -55,8 +55,7 @@ function App() {
             >
                 <div>
                     <h4>Amount of words</h4>
-                    <select name="words" id="words" onChange={(e) => setWords(Number(e.target.value))}>
-                        <option value="1">1</option>
+                    <select name="words" id="words" defaultValue="2" onChange={(e) => setWords(Number(e.target.value))}>
                         <option value="2">2</option>
                         <option value="3">3</option>
                         <option value="4">4</option>
