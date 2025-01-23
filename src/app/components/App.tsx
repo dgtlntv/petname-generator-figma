@@ -1,61 +1,68 @@
-import React from "react"
+import { ChangeEvent, useState } from "react"
+import { CancelMessage, GeneratePetnamesMessage } from "../../typings/types"
 import "../styles/ui.scss"
 
-function App() {
-    const [words, setWords] = React.useState(2)
-    const [separator, setSeparator] = React.useState("-")
-    const [letters, setLetters] = React.useState(undefined)
-    const [ubuntu, setUbuntu] = React.useState(true)
+export default function App() {
+    const [words, setWords] = useState<number>(2)
+    const [separator, setSeparator] = useState<string>("-")
+    const [letters, setLetters] = useState<number | undefined>(undefined)
+    const [ubuntu, setUbuntu] = useState<boolean>(true)
 
-    const onGenerate = () => {
-        parent.postMessage({ pluginMessage: { type: "generate-petnames", words, separator, letters, ubuntu } }, "*")
+    // Event handlers
+    const handleWordsChange = (e: ChangeEvent<HTMLSelectElement>): void => {
+        setWords(Number(e.target.value))
     }
 
-    const onCancel = () => {
-        parent.postMessage({ pluginMessage: { type: "cancel" } }, "*")
+    const handleSeparatorChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        setSeparator(e.target.value)
+    }
+
+    const handleLettersChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        const value = e.target.value ? Number(e.target.value) : undefined
+        setLetters(value)
+    }
+
+    const handleUbuntuChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        setUbuntu(e.target.checked)
+    }
+
+    // Plugin message handlers
+    const handleGenerate = (): void => {
+        const message: GeneratePetnamesMessage = {
+            type: "generate-petnames",
+            words,
+            separator,
+            letters,
+            ubuntu,
+        }
+        parent.postMessage({ pluginMessage: message }, "*")
+    }
+
+    const handleCancel = (): void => {
+        const message: CancelMessage = { type: "cancel" }
+        parent.postMessage({ pluginMessage: message }, "*")
     }
 
     return (
-        <div
-            style={{
-                paddingLeft: "24px",
-                paddingRight: "24px",
-                paddingBottom: "24px",
-            }}
-        >
-            <header
-                style={{
-                    display: "flex",
-                    alignItems: "flex-end",
-                }}
-            >
+        <div className="petname-generator__container">
+            <header className="petname-generator__header">
                 <img
                     src={require("./canonical.svg")}
                     alt="Canonical Logo"
-                    style={{
-                        maxWidth: "32px",
-                        marginRight: "8px",
-                    }}
+                    className="petname-generator__logo"
                 />
-
-                <h2
-                    style={{
-                        margin: "0",
-                        verticalAlign: "bottom",
-                    }}
-                >
-                    Petname generator
-                </h2>
+                <h2 className="petname-generator__title">Petname generator</h2>
             </header>
 
-            <div
-                style={{
-                    margin: "24px 0",
-                }}
-            >
+            <div className="petname-generator__form-section">
                 <div>
                     <h4>Amount of words</h4>
-                    <select name="words" id="words" defaultValue="2" onChange={(e) => setWords(Number(e.target.value))}>
+                    <select
+                        name="words"
+                        id="words"
+                        defaultValue="2"
+                        onChange={handleWordsChange}
+                    >
                         <option value="2">2</option>
                         <option value="3">3</option>
                         <option value="4">4</option>
@@ -69,7 +76,7 @@ function App() {
                         type="text"
                         id="separator"
                         name="separator"
-                        onChange={(e) => setSeparator(e.target.value)}
+                        onChange={handleSeparatorChange}
                         minLength={0}
                         maxLength={1}
                         placeholder="-"
@@ -78,7 +85,12 @@ function App() {
 
                 <div>
                     <h4>Word length</h4>
-                    <input type="number" id="letters" name="letters" onChange={(e) => setLetters(e.target.value)} />
+                    <input
+                        type="number"
+                        id="letters"
+                        name="letters"
+                        onChange={handleLettersChange}
+                    />
                 </div>
 
                 <div>
@@ -88,21 +100,19 @@ function App() {
                         id="ubuntu"
                         name="ubuntu"
                         defaultChecked
-                        onChange={(e) => setUbuntu(e.target.checked)}
+                        onChange={handleUbuntuChange}
                     />
                 </div>
             </div>
 
-            <footer
-                style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                }}
-            >
+            <footer className="petname-generator__footer">
                 <div>
-                    <button onClick={onCancel}>Cancel</button>
-                    <button className="p-button--positive" id="generate" onClick={onGenerate}>
+                    <button onClick={handleCancel}>Cancel</button>
+                    <button
+                        className="p-button--positive"
+                        id="generate"
+                        onClick={handleGenerate}
+                    >
                         Generate
                     </button>
                 </div>
@@ -110,5 +120,3 @@ function App() {
         </div>
     )
 }
-
-export default App

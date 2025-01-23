@@ -17,7 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const adjectives = [
+export const adjectives: string[] = [
     "abiding",
     "able",
     "abounding",
@@ -1217,5 +1217,3 @@ const adjectives = [
     "zany",
     "zealous",
 ]
-
-export default adjectives
