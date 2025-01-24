@@ -7,7 +7,7 @@ export default function App() {
     const [words, setWords] = useState<number>(2)
     const [separator, setSeparator] = useState<string>("-")
     const [letters, setLetters] = useState<number | undefined>(undefined)
-    const [ubuntu, setUbuntu] = useState<boolean>(true)
+    const [startingLetter, setStartingLetter] = useState<string>("ubuntu")
 
     // Event handlers
     const handleWordsChange = (e: ChangeEvent<HTMLSelectElement>): void => {
@@ -23,8 +23,10 @@ export default function App() {
         setLetters(value)
     }
 
-    const handleUbuntuChange = (e: ChangeEvent<HTMLInputElement>): void => {
-        setUbuntu(e.target.checked)
+    const handleStartingLetterChange = (
+        e: ChangeEvent<HTMLInputElement>
+    ): void => {
+        setStartingLetter(e.target.value)
     }
 
     // Plugin message handlers
@@ -34,7 +36,7 @@ export default function App() {
             words,
             separator,
             letters,
-            ubuntu,
+            ubuntu: startingLetter === "ubuntu", // Convert to boolean based on selection
         }
         parent.postMessage({ pluginMessage: message }, "*")
     }
@@ -54,6 +56,11 @@ export default function App() {
                 />
                 <h2 className="petname-generator__title">Petname generator</h2>
             </header>
+
+            <p>
+                Select text nodes, configure the settings below and click
+                generate.
+            </p>
 
             <div className="petname-generator__form-section">
                 <div>
@@ -95,14 +102,35 @@ export default function App() {
                 </div>
 
                 <div>
-                    <h4>Ubuntu style?</h4>
-                    <input
-                        type="checkbox"
-                        id="ubuntu"
-                        name="ubuntu"
-                        defaultChecked
-                        onChange={handleUbuntuChange}
-                    />
+                    <h4>Starting letter</h4>
+                    <label className="p-radio">
+                        <input
+                            type="radio"
+                            className="p-radio__input"
+                            name="startingLetter"
+                            value="ubuntu"
+                            defaultChecked
+                            onChange={handleStartingLetterChange}
+                            aria-labelledby="ubuntuStyleLabel"
+                        />
+                        <span className="p-radio__label" id="ubuntuStyleLabel">
+                            Ubuntu style (same starting letter)
+                        </span>
+                    </label>
+
+                    <label className="p-radio">
+                        <input
+                            type="radio"
+                            className="p-radio__input"
+                            name="startingLetter"
+                            value="random"
+                            onChange={handleStartingLetterChange}
+                            aria-labelledby="randomLabel"
+                        />
+                        <span className="p-radio__label" id="randomLabel">
+                            Random
+                        </span>
+                    </label>
                 </div>
             </div>
 

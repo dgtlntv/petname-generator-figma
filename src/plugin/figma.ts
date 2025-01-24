@@ -9,7 +9,7 @@ function isGeneratePetnamesMessage(msg: any): msg is GeneratePetnamesMessage {
 // Show the UI with specified dimensions
 figma.showUI(__html__, {
     width: 400,
-    height: 600,
+    height: 700,
 })
 
 // Handle messages from the UI

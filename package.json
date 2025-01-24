@@ -5,8 +5,12 @@
     "license": "GPL-3.0",
     "scripts": {
         "dev": "vite",
-        "build:figma": "vite build --mode figma",
-        "build:penpot": "vite build --mode penpot",
+        "build:figma-ui": "vite build --mode figma-ui",
+        "build:figma-plugin": "vite build --mode figma-plugin",
+        "build:penpot-ui": "vite build --mode penpot-ui",
+        "build:penpot-plugin": "vite build --mode penpot-plugin",
+        "build:figma": "npm run build:figma-ui && npm run build:figma-plugin",
+        "build:penpot": "npm run build:penpot-ui && npm run build:penpot-plugin",
         "build": "npm run build:figma && npm run build:penpot",
         "preview": "vite preview"
     },
@@ -16,7 +20,8 @@
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "sass": "^1.83.4",
-        "vanilla-framework": "^4.20.1"
+        "vanilla-framework": "^4.20.1",
+        "vite-plugin-singlefile": "^2.1.0"
     },
     "devDependencies": {
         "@figma/plugin-typings": "^1.107.0-beta.1",
