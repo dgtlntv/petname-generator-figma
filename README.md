@@ -11,3 +11,5 @@ To build the plugins run `npm run build`. This will create a `dist` folder. Foll
 
 This is esentially a React app. Both plugins share most of their code. They just need different plugin Typescript files which are located under `./src/plugin/` and different manifest files located under `./plugin-manifests`.
 The vite config contains different build modes for the HTML and Javascript for both Figma and Penpot. Executing `npm run build` runs all of them.
+
+The contents of the public folder are required by the Penpot plugin.
