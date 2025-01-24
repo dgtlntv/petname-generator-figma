@@ -10,16 +10,30 @@ export interface GeneratePetnamesMessage {
 }
 
 /**
- * Message for canceling the operation
+ * Message for generating pet names and closing
  */
-export interface CancelMessage {
-    type: "cancel"
+export interface GenerateAndCloseMessage {
+    type: "generate-and-close"
+    words: number
+    separator: string
+    letters?: number
+    ubuntu: boolean
+}
+
+/**
+ * Message for closing the plugin
+ */
+export interface CloseMessage {
+    type: "close"
 }
 
 /**
  * Union type of all possible plugin messages
  */
-export type PluginMessage = GeneratePetnamesMessage | CancelMessage
+export type PluginMessage =
+    | GeneratePetnamesMessage
+    | GenerateAndCloseMessage
+    | CloseMessage
 
 /**
  * Configuration options for pet name generation

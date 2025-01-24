@@ -1,5 +1,9 @@
 import { ChangeEvent, useState } from "react"
-import { CancelMessage, GeneratePetnamesMessage } from "../../typings/types"
+import {
+    CloseMessage,
+    GenerateAndCloseMessage,
+    GeneratePetnamesMessage,
+} from "../../typings/types"
 import "../styles/ui.scss"
 import canonicalLogo from "./canonical.svg"
 
@@ -10,8 +14,9 @@ export default function App() {
     const [startingLetter, setStartingLetter] = useState<string>("ubuntu")
 
     // Event handlers
-    const handleWordsChange = (e: ChangeEvent<HTMLSelectElement>): void => {
-        setWords(Number(e.target.value))
+    const handleWordsChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        const value = Math.min(Math.max(1, Number(e.target.value)), 5)
+        setWords(value)
     }
 
     const handleSeparatorChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -19,7 +24,9 @@ export default function App() {
     }
 
     const handleLettersChange = (e: ChangeEvent<HTMLInputElement>): void => {
-        const value = e.target.value ? Number(e.target.value) : undefined
+        const value = e.target.value
+            ? Math.min(Number(e.target.value), 12)
+            : undefined
         setLetters(value)
     }
 
@@ -36,13 +43,24 @@ export default function App() {
             words,
             separator,
             letters,
-            ubuntu: startingLetter === "ubuntu", // Convert to boolean based on selection
+            ubuntu: startingLetter === "ubuntu",
         }
         parent.postMessage({ pluginMessage: message }, "*")
     }
 
-    const handleCancel = (): void => {
-        const message: CancelMessage = { type: "cancel" }
+    const handleClose = (): void => {
+        const message: CloseMessage = { type: "close" }
+        parent.postMessage({ pluginMessage: message }, "*")
+    }
+
+    const handleGenerateAndClose = (): void => {
+        const message: GenerateAndCloseMessage = {
+            type: "generate-and-close",
+            words,
+            separator,
+            letters,
+            ubuntu: startingLetter === "ubuntu",
+        }
         parent.postMessage({ pluginMessage: message }, "*")
     }
 
@@ -64,22 +82,26 @@ export default function App() {
 
             <div className="petname-generator__form-section">
                 <div>
-                    <h4>Amount of words</h4>
-                    <select
+                    <label htmlFor="words">Amount of words</label>
+                    <input
+                        type="number"
                         name="words"
                         id="words"
-                        defaultValue="2"
+                        value={words}
                         onChange={handleWordsChange}
+                        min={1}
+                        max={5}
+                    />
+                    <p
+                        className="p-form-help-text"
+                        id="exampleInputHelpMessage"
                     >
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
+                        Maximum amount of words is 5.
+                    </p>
                 </div>
 
                 <div>
-                    <h4>Separator</h4>
+                    <label htmlFor="separator">Separator</label>
                     <input
                         type="text"
                         id="separator"
@@ -87,22 +109,37 @@ export default function App() {
                         onChange={handleSeparatorChange}
                         minLength={0}
                         maxLength={1}
-                        placeholder="-"
+                        value={separator}
                     />
+                    <p
+                        className="p-form-help-text"
+                        id="exampleInputHelpMessage"
+                    >
+                        A separator like -, _, : etc. Can only be one character.
+                    </p>
                 </div>
 
                 <div>
-                    <h4>Word length</h4>
+                    <label htmlFor="separator">Max. word length</label>
                     <input
                         type="number"
                         id="letters"
                         name="letters"
                         onChange={handleLettersChange}
+                        min={1}
+                        max={12}
+                        value={letters || ""}
                     />
+                    <p
+                        className="p-form-help-text"
+                        id="exampleInputHelpMessage"
+                    >
+                        Leave empty to allow any length.
+                    </p>
                 </div>
 
                 <div>
-                    <h4>Starting letter</h4>
+                    <label>Starting letter per word</label>
                     <label className="p-radio">
                         <input
                             type="radio"
@@ -136,7 +173,16 @@ export default function App() {
 
             <footer className="petname-generator__footer">
                 <div>
-                    <button onClick={handleCancel}>Cancel</button>
+                    <button className="p-button--base" onClick={handleClose}>
+                        Close
+                    </button>
+                    <button
+                        className="p-button"
+                        id="generate-and-close"
+                        onClick={handleGenerateAndClose}
+                    >
+                        Generate & Close
+                    </button>
                     <button
                         className="p-button--positive"
                         id="generate"

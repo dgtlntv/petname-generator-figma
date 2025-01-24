@@ -89,9 +89,9 @@ export default function generatePetname({
         nam = nam.filter((v: string): boolean => v.startsWith(startingLetter))
     }
 
-    // Ensure minimum of 2 words
+    // Ensure minimum of 1 word
     if (words <= 0) {
-        words = 2
+        words = 1
     }
 
     // Generate name parts based on requested word count
