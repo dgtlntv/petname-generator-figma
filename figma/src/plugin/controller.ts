@@ -1,4 +1,4 @@
-import generatePetname from "../petname/petname"
+import generatePetname from "../../../petname/petname"
 import { GeneratePetnamesMessage } from "../typings/types"
 
 // Type guard to check if a message is a GeneratePetnamesMessage
