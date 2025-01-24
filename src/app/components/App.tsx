@@ -1,6 +1,7 @@
 import { ChangeEvent, useState } from "react"
 import { CancelMessage, GeneratePetnamesMessage } from "../../typings/types"
 import "../styles/ui.scss"
+import canonicalLogo from "./canonical.svg"
 
 export default function App() {
     const [words, setWords] = useState<number>(2)
@@ -47,7 +48,7 @@ export default function App() {
         <div className="petname-generator__container">
             <header className="petname-generator__header">
                 <img
-                    src={require("./canonical.svg")}
+                    src={canonicalLogo}
                     alt="Canonical Logo"
                     className="petname-generator__logo"
                 />

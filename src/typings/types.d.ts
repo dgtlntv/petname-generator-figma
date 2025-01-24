@@ -39,8 +39,3 @@ export interface PluginMessagePayload {
 }
 
 export type WordList = string[]
-
-declare module "*.svg" {
-    const content: any
-    export default content
-}
