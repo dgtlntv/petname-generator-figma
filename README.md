@@ -1,4 +1,5 @@
 # Canonical pet name generator plugin for Figma and Penpot
+<img src="https://github.com/user-attachments/assets/234765ad-b9ff-4517-bb10-847183500898" width="600">
 
 This is a plugin which can generate Ubuntu style pet names for selected text nodes in Figma and Penpot.
 
