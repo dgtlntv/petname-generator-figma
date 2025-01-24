@@ -6,7 +6,7 @@ function isGeneratePetnamesMessage(msg: any): msg is GeneratePetnamesMessage {
     return msg.type === "generate-petnames"
 }
 
-// Show the UI with specified dimensions (note: Penpot doesn't support dimension configuration)
+// Show the UI with specified dimensions
 penpot.ui.open("Canonical pet name generator", `?theme=${penpot.theme}`, {
     width: 400,
     height: 750,
