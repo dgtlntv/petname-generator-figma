@@ -1,3 +1,4 @@
+import purgecss from "@fullhuman/postcss-purgecss"
 import react from "@vitejs/plugin-react"
 import fs from "fs"
 import path from "path"
@@ -20,13 +21,33 @@ const sharedConfig: UserConfig = {
                 },
             },
         },
+        postcss: {
+            plugins: [
+                purgecss({
+                    content: [
+                        "./src/**/*.html",
+                        "./src/**/*.tsx",
+                        "./src/**/*.ts",
+                        "./src/**/*.jsx",
+                        "./src/**/*.js",
+                    ],
+                    safelist: {
+                        standard: ["html", "body"],
+                        deep: [/^figma-/, /^penpot-/],
+                        greedy: [/^react-/],
+                    },
+                    defaultExtractor: (content) =>
+                        content.match(/[\w-/:]+(?<!:)/g) || [],
+                }),
+            ],
+        },
     },
     resolve: {
         extensions: [".tsx", ".ts", ".jsx", ".js"],
     },
 }
 
-// Copy manifest plugin with customizable input and output paths
+// Rest of the configuration remains the same
 const createManifestPlugin = (
     inputPath: string,
     outputPath: string
@@ -45,7 +66,6 @@ const createManifestPlugin = (
     },
 })
 
-// Configuration for Figma UI build
 const getFigmaUIConfig = (): UserConfig => ({
     ...sharedConfig,
     plugins: [
@@ -68,7 +88,6 @@ const getFigmaUIConfig = (): UserConfig => ({
     },
 })
 
-// Configuration for Figma plugin code build
 const getFigmaPluginConfig = (): UserConfig => ({
     ...sharedConfig,
     plugins: [],
@@ -76,7 +95,7 @@ const getFigmaPluginConfig = (): UserConfig => ({
     build: {
         ...sharedConfig.build,
         outDir: path.resolve(__dirname, "dist/figma"),
-        emptyOutDir: false, // Don't empty since UI was built here
+        emptyOutDir: false,
         lib: {
             entry: path.resolve(__dirname, "src/plugin/figma.ts"),
             formats: ["iife"],
@@ -86,7 +105,6 @@ const getFigmaPluginConfig = (): UserConfig => ({
     },
 })
 
-// Configuration for Penpot UI build
 const getPenpotUIConfig = (): UserConfig => ({
     ...sharedConfig,
     plugins: [
@@ -109,7 +127,6 @@ const getPenpotUIConfig = (): UserConfig => ({
     },
 })
 
-// Configuration for Penpot plugin code build
 const getPenpotPluginConfig = (): UserConfig => ({
     ...sharedConfig,
     plugins: [],
@@ -117,7 +134,7 @@ const getPenpotPluginConfig = (): UserConfig => ({
     build: {
         ...sharedConfig.build,
         outDir: path.resolve(__dirname, "dist/penpot"),
-        emptyOutDir: false, // Don't empty since UI was built here
+        emptyOutDir: false,
         lib: {
             entry: path.resolve(__dirname, "src/plugin/penpot.ts"),
             formats: ["iife"],
@@ -127,7 +144,6 @@ const getPenpotPluginConfig = (): UserConfig => ({
     },
 })
 
-// Development server configuration
 const getDevConfig = (): UserConfig => ({
     ...sharedConfig,
     plugins: [
@@ -147,13 +163,11 @@ const getDevConfig = (): UserConfig => ({
     },
 })
 
-// Export configuration based on command and mode
 export default defineConfig(({ command, mode }) => {
     if (command === "serve") {
         return getDevConfig()
     }
 
-    // For build command, use mode to determine which config to use
     if (command === "build") {
         switch (mode) {
             case "figma-ui":

@@ -15,6 +15,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@fullhuman/postcss-purgecss": "^7.0.2",
         "@penpot/plugin-styles": "^1.1.0",
         "@penpot/plugin-types": "^1.1.0",
         "react": "^19.0.0",
