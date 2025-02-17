@@ -1,1 +1,1 @@
-export type WordList = string[]
+export type WordList = string[];

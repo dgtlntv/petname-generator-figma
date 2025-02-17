@@ -3,7 +3,7 @@ import {
   MessageType,
   type PluginMessage,
   StartingLetterStyle,
-} from "../../types";
+} from "../../types.js";
 import "../styles/index.scss";
 import canonicalLogo from "./canonical.svg";
 

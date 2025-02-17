@@ -1,7 +1,11 @@
 import type { Shape } from "@penpot/plugin-types";
-import generatePetName from "../petname/petname";
-import { MessageType, type PetNameOptions, type PluginMessage } from "../types";
-import * as CONFIG from "./penpot.config";
+import generatePetName from "../petname/petname.js";
+import {
+  MessageType,
+  type PetNameOptions,
+  type PluginMessage,
+} from "../types.js";
+import * as CONFIG from "./penpot.config.js";
 
 /**
  * Initialize and open the plugin window with specified configuration

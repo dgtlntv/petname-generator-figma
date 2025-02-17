@@ -1,14 +1,15 @@
 {
-    "extends": "@canonical/typescript-config-react",
-    "compilerOptions": {
-        /* Paths */
-        "typeRoots": [
-            "./node_modules/@types",
-            "./node_modules/@figma",
-            "./node_modules/@penpot"
-        ],
-        "types": ["plugin-types", "plugin-typings"]
-    },
-    "include": ["src", "vite-env.d.ts"],
-    "references": [{ "path": "./tsconfig.node.json" }]
+  "extends": "@canonical/typescript-config-react",
+  "compilerOptions": {
+    /* Paths */
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@figma",
+      "./node_modules/@penpot"
+    ],
+    "skipLibCheck": true,
+    "types": ["plugin-types", "plugin-typings"]
+  },
+  "include": ["src", "vite-env.d.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,6 +1,10 @@
-import generatePetName from "../petname/petname";
-import { MessageType, type PetNameOptions, type PluginMessage } from "../types";
-import * as CONFIG from "./figma.config";
+import generatePetName from "../petname/petname.js";
+import {
+  MessageType,
+  type PetNameOptions,
+  type PluginMessage,
+} from "../types.js";
+import * as CONFIG from "./figma.config.js";
 
 /**
  * Initialize and open the plugin window with specified configuration

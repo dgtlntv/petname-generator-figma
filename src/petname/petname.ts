@@ -1,8 +1,8 @@
-import { type PetNameOptions, StartingLetterStyle } from "../types";
-import { adjectives } from "./data/adjectives";
-import { adverbs } from "./data/adverbs";
-import { names } from "./data/names";
-import type { WordList } from "./types";
+import { type PetNameOptions, StartingLetterStyle } from "../types.js";
+import { adjectives } from "./data/adjectives.js";
+import { adverbs } from "./data/adverbs.js";
+import { names } from "./data/names.js";
+import type { WordList } from "./types.js";
 
 const FALLBACK_PET_NAME = "warty-warthog";
 

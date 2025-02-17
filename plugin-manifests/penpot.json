@@ -1,13 +1,13 @@
 {
-    "name": "Canonical pet name generator",
-    "description": "This plugin generates Ubuntu style pet names for each selected text node in Penpot.",
-    "code": "./code.js",
-    "icon": "./canonical.png",
-    "permissions": [
-        "page:read",
-        "content:read",
-        "content:write",
-        "file:read",
-        "selection:read"
-    ]
+  "name": "Canonical pet name generator",
+  "description": "This plugin generates Ubuntu style pet names for each selected text node in Penpot.",
+  "code": "./code.js",
+  "icon": "./canonical.png",
+  "permissions": [
+    "page:read",
+    "content:read",
+    "content:write",
+    "file:read",
+    "selection:read"
+  ]
 }
