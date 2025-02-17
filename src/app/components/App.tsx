@@ -1,68 +1,115 @@
-import { ChangeEvent, useState } from "react"
-import {
-    CloseMessage,
-    GenerateAndCloseMessage,
-    GeneratePetnamesMessage,
-} from "../../typings/types"
-import "../styles/ui.scss"
+import { ChangeEvent, useCallback, useState } from "react"
+import { MessageType, PluginMessage, StartingLetterStyle } from "../../types"
+import "../styles/index.scss"
 import canonicalLogo from "./canonical.svg"
 
+/**
+ * Main application component for the Petname Generator.
+ * This component allows users to generate pet names with configurable settings
+ * such as word count, separator, maximum word length, and starting letter style.
+ *
+ * @returns {JSX.Element} The rendered Petname Generator interface
+ */
 export default function App() {
-    const [words, setWords] = useState<number>(2)
-    const [separator, setSeparator] = useState<string>("-")
-    const [letters, setLetters] = useState<number | undefined>(undefined)
-    const [startingLetter, setStartingLetter] = useState<string>("ubuntu")
+    const [wordCount, setWordCount] = useState<number>(2)
+    const [wordSeparator, setWordSeparator] = useState<string>("-")
+    const [maxWordLength, setMaxWordLength] = useState<number | undefined>(
+        undefined
+    )
+    const [startingLetterStyle, setStartingLetterStyle] =
+        useState<StartingLetterStyle>(StartingLetterStyle.UBUNTU)
 
-    // Event handlers
-    const handleWordsChange = (e: ChangeEvent<HTMLInputElement>): void => {
-        const value = Math.min(Math.max(1, Number(e.target.value)), 5)
-        setWords(value)
-    }
+    /**
+     * Handles changes to the word count input.
+     * Ensures the value stays between 1 and 5.
+     *
+     * @param {ChangeEvent<HTMLInputElement>} e - The input change event
+     */
+    const handleWordCountChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>): void => {
+            const value = Math.min(Math.max(1, Number(e.target.value)), 5)
+            setWordCount(value)
+        },
+        []
+    )
 
-    const handleSeparatorChange = (e: ChangeEvent<HTMLInputElement>): void => {
-        setSeparator(e.target.value)
-    }
+    /**
+     * Handles changes to the word separator input.
+     *
+     * @param {ChangeEvent<HTMLInputElement>} e - The input change event
+     */
+    const handleWordSeparatorChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>): void => {
+            setWordSeparator(e.target.value)
+        },
+        []
+    )
 
-    const handleLettersChange = (e: ChangeEvent<HTMLInputElement>): void => {
-        const value = e.target.value
-            ? Math.min(Number(e.target.value), 12)
-            : undefined
-        setLetters(value)
-    }
+    /**
+     * Handles changes to the maximum word length input.
+     * Ensures the value doesn't exceed 12 characters.
+     *
+     * @param {ChangeEvent<HTMLInputElement>} e - The input change event
+     */
+    const handleMaxWordLengthChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>): void => {
+            const value = e.target.value
+                ? Math.min(Number(e.target.value), 12)
+                : undefined
+            setMaxWordLength(value)
+        },
+        []
+    )
 
-    const handleStartingLetterChange = (
-        e: ChangeEvent<HTMLInputElement>
-    ): void => {
-        setStartingLetter(e.target.value)
-    }
+    /**
+     * Handles changes to the starting letter style radio buttons.
+     *
+     * @param {ChangeEvent<HTMLInputElement>} e - The input change event
+     */
+    const handleStartingLetterStyleChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>): void => {
+            setStartingLetterStyle(e.target.value as StartingLetterStyle)
+        },
+        []
+    )
 
-    // Plugin message handlers
-    const handleGenerate = (): void => {
-        const message: GeneratePetnamesMessage = {
-            type: "generate-petnames",
-            words,
-            separator,
-            letters,
-            ubuntu: startingLetter === "ubuntu",
+    /**
+     * Sends a message to generate pet names with the current settings.
+     */
+    const handleGenerate = useCallback((): void => {
+        const message: PluginMessage = {
+            type: MessageType.GENERATE_PETNAMES,
+            wordCount,
+            wordSeparator,
+            maxWordLength,
+            startingLetterStyle,
         }
         parent.postMessage({ pluginMessage: message }, "*")
-    }
+    }, [wordCount, wordSeparator, maxWordLength, startingLetterStyle])
 
-    const handleClose = (): void => {
-        const message: CloseMessage = { type: "close" }
-        parent.postMessage({ pluginMessage: message }, "*")
-    }
-
-    const handleGenerateAndClose = (): void => {
-        const message: GenerateAndCloseMessage = {
-            type: "generate-and-close",
-            words,
-            separator,
-            letters,
-            ubuntu: startingLetter === "ubuntu",
+    /**
+     * Sends a message to close the plugin interface.
+     */
+    const handleClose = useCallback((): void => {
+        const message: PluginMessage = {
+            type: MessageType.CLOSE,
         }
         parent.postMessage({ pluginMessage: message }, "*")
-    }
+    }, [])
+
+    /**
+     * Sends a message to generate pet names and close the plugin interface.
+     */
+    const handleGenerateAndClose = useCallback((): void => {
+        const message: PluginMessage = {
+            type: MessageType.GENERATE_AND_CLOSE,
+            wordCount,
+            wordSeparator,
+            maxWordLength,
+            startingLetterStyle,
+        }
+        parent.postMessage({ pluginMessage: message }, "*")
+    }, [wordCount, wordSeparator, maxWordLength, startingLetterStyle])
 
     return (
         <div className="petname-generator__container">
@@ -87,15 +134,12 @@ export default function App() {
                         type="number"
                         name="words"
                         id="words"
-                        value={words}
-                        onChange={handleWordsChange}
+                        value={wordCount}
+                        onChange={handleWordCountChange}
                         min={1}
                         max={5}
                     />
-                    <p
-                        className="p-form-help-text"
-                        id="exampleInputHelpMessage"
-                    >
+                    <p className="p-form-help-text">
                         Maximum amount of words is 5.
                     </p>
                 </div>
@@ -106,34 +150,28 @@ export default function App() {
                         type="text"
                         id="separator"
                         name="separator"
-                        onChange={handleSeparatorChange}
+                        onChange={handleWordSeparatorChange}
                         minLength={0}
                         maxLength={1}
-                        value={separator}
+                        value={wordSeparator}
                     />
-                    <p
-                        className="p-form-help-text"
-                        id="exampleInputHelpMessage"
-                    >
+                    <p className="p-form-help-text">
                         A separator like -, _, : etc. Can only be one character.
                     </p>
                 </div>
 
                 <div>
-                    <label htmlFor="separator">Max. word length</label>
+                    <label htmlFor="letters">Max. word length</label>
                     <input
                         type="number"
                         id="letters"
                         name="letters"
-                        onChange={handleLettersChange}
+                        onChange={handleMaxWordLengthChange}
                         min={1}
                         max={12}
-                        value={letters || ""}
+                        value={maxWordLength || ""}
                     />
-                    <p
-                        className="p-form-help-text"
-                        id="exampleInputHelpMessage"
-                    >
+                    <p className="p-form-help-text">
                         Leave empty to allow any length.
                     </p>
                 </div>
@@ -145,9 +183,9 @@ export default function App() {
                             type="radio"
                             className="p-radio__input"
                             name="startingLetter"
-                            value="ubuntu"
+                            value={StartingLetterStyle.UBUNTU}
                             defaultChecked
-                            onChange={handleStartingLetterChange}
+                            onChange={handleStartingLetterStyleChange}
                             aria-labelledby="ubuntuStyleLabel"
                         />
                         <span className="p-radio__label" id="ubuntuStyleLabel">
@@ -160,8 +198,8 @@ export default function App() {
                             type="radio"
                             className="p-radio__input"
                             name="startingLetter"
-                            value="random"
-                            onChange={handleStartingLetterChange}
+                            value={StartingLetterStyle.RANDOM}
+                            onChange={handleStartingLetterStyleChange}
                             aria-labelledby="randomLabel"
                         />
                         <span className="p-radio__label" id="randomLabel">

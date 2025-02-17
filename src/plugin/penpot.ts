@@ -1,43 +1,32 @@
 import { Shape } from "@penpot/plugin-types"
 import generatePetname from "../petname/petname"
+import { MessageType, PetnameOptions, PluginMessage } from "../types"
 import {
-    CloseMessage,
-    GenerateAndCloseMessage,
-    GeneratePetnamesMessage,
-} from "../typings/types"
+    NOTIFICATION_MESSAGES,
+    TEXT_STYLES,
+    UI_DIMENSIONS,
+    WINDOW_CONFIG,
+} from "./penpot.config"
 
-// Type guards
-function isGeneratePetnamesMessage(msg: any): msg is GeneratePetnamesMessage {
-    return msg.type === "generate-petnames"
-}
-
-function isGenerateAndCloseMessage(msg: any): msg is GenerateAndCloseMessage {
-    return msg.type === "generate-and-close"
-}
-
-function isCloseMessage(msg: any): msg is CloseMessage {
-    return msg.type === "close"
-}
-
-// Show the UI with specified dimensions
-penpot.ui.open("Canonical pet name generator", `?theme=${penpot.theme}`, {
-    width: 450,
-    height: 770,
+/**
+ * Initialize and open the plugin window with specified configuration
+ */
+penpot.ui.open(WINDOW_CONFIG.TITLE, WINDOW_CONFIG.THEME_PARAM(penpot.theme), {
+    width: UI_DIMENSIONS.WIDTH,
+    height: UI_DIMENSIONS.HEIGHT,
 })
 
-// Function to create a text node at the center of the viewport
+/**
+ * Creates a new text node at the center of the viewport
+ * @returns {Shape | undefined} The created text node, or undefined if creation fails
+ */
 function createCenteredTextNode() {
-    // Get the viewport information
     const viewport = penpot.viewport
     const center = viewport.center
-
-    // Create a text node
     const textNode = penpot.createText(" ")
 
-    // Set Ubuntu Sans as the font if the API supports it
     if (textNode) {
-        textNode.fontFamily = "Ubuntu Sans"
-        // Set its position to the center of the viewport
+        textNode.fontFamily = TEXT_STYLES.FONT_FAMILY
         textNode.x = center.x
         textNode.y = center.y
     }
@@ -45,19 +34,19 @@ function createCenteredTextNode() {
     return textNode
 }
 
-// Function to handle generating petnames
-async function handlePetnameGeneration(
-    config: Omit<GeneratePetnamesMessage, "type">
-) {
+/**
+ * Handles the generation of pet names for selected or newly created text nodes
+ * @param {PetnameOptions} config - Configuration options for pet name generation
+ * @returns {Promise<void>}
+ */
+async function handlePetnameGeneration(config: PetnameOptions) {
     let workingNodes: readonly Shape[] = []
     let modifiedCount = 0
     let isNewNode = false
 
-    // Check if there are any text nodes selected
     const textNodes = penpot.selection.filter((node) => node.type === "text")
 
     if (textNodes.length === 0) {
-        // Create a new text node in the center if none are selected
         const newNode = createCenteredTextNode()
         if (newNode) {
             workingNodes = [newNode]
@@ -67,45 +56,43 @@ async function handlePetnameGeneration(
         workingNodes = penpot.selection
     }
 
-    // Iterate through all nodes
     for (const node of workingNodes) {
-        // Check if the node is a text node
         if (node.type === "text") {
-            // Generate and set the new pet name
-            node.characters = generatePetname({
-                words: config.words,
-                separator: config.separator,
-                letters: config.letters,
-                ubuntu: config.ubuntu,
-            })
+            node.characters = generatePetname(config)
             modifiedCount++
         }
     }
 
-    // We can use console.log for debugging instead of notifications
     if (isNewNode) {
-        console.log("Created new text node with pet name")
+        console.log(NOTIFICATION_MESSAGES.NEW_NODE)
     } else if (modifiedCount > 0) {
         console.log(
-            `Renamed ${modifiedCount} ${modifiedCount === 1 ? "node" : "nodes"} with pet names`
+            modifiedCount === 1
+                ? NOTIFICATION_MESSAGES.RENAMED_SINGLE
+                : NOTIFICATION_MESSAGES.RENAMED_MULTIPLE(modifiedCount)
         )
     }
 }
 
-// Handle messages from the UI
+/**
+ * Message handler for plugin UI interactions
+ * Processes different types of messages and performs corresponding actions
+ * @param {unknown} msg - The message received from the UI
+ * @returns {Promise<void>}
+ */
 penpot.ui.onMessage(async (msg: unknown) => {
-    // Extract the plugin message from Penpot's message structure
-    const pluginMessage = (msg as any).pluginMessage
+    const pluginMessage = (msg as any).pluginMessage as PluginMessage
 
-    if (isGeneratePetnamesMessage(pluginMessage)) {
-        // Just generate the names
-        await handlePetnameGeneration(pluginMessage)
-    } else if (isGenerateAndCloseMessage(pluginMessage)) {
-        // Generate the names and then close
-        await handlePetnameGeneration(pluginMessage)
-        penpot.closePlugin()
-    } else if (isCloseMessage(pluginMessage)) {
-        // Just close the plugin
-        penpot.closePlugin()
+    switch (pluginMessage.type) {
+        case MessageType.GENERATE_PETNAMES:
+            await handlePetnameGeneration(pluginMessage)
+            break
+        case MessageType.GENERATE_AND_CLOSE:
+            await handlePetnameGeneration(pluginMessage)
+            penpot.closePlugin()
+            break
+        case MessageType.CLOSE:
+            penpot.closePlugin()
+            break
     }
 })

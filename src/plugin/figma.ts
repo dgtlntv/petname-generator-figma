@@ -1,70 +1,63 @@
 import generatePetname from "../petname/petname"
+import { MessageType, PetnameOptions, PluginMessage } from "../types"
 import {
-    CloseMessage,
-    GenerateAndCloseMessage,
-    GeneratePetnamesMessage,
-} from "../typings/types"
+    NOTIFICATION_MESSAGES,
+    TEXT_STYLES,
+    UI_DIMENSIONS,
+} from "./figma.config"
 
-// Type guards
-function isGeneratePetnamesMessage(msg: any): msg is GeneratePetnamesMessage {
-    return msg.type === "generate-petnames"
-}
-
-function isGenerateAndCloseMessage(msg: any): msg is GenerateAndCloseMessage {
-    return msg.type === "generate-and-close"
-}
-
-function isCloseMessage(msg: any): msg is CloseMessage {
-    return msg.type === "close"
-}
-
-// Show the UI with specified dimensions
+/**
+ * Initialize and open the plugin window with specified configuration
+ */
 figma.showUI(__html__, {
-    width: 450,
-    height: 720,
+    width: UI_DIMENSIONS.WIDTH,
+    height: UI_DIMENSIONS.HEIGHT,
 })
 
-// Function to create a text node at the center of the viewport
+/**
+ * Creates a new text node centered in the viewport with default text styles
+ * @async
+ * @returns {Promise<TextNode>} A promise that resolves to the created text node
+ */
 async function createCenteredTextNode() {
-    // Get the center of the current viewport
     const center = figma.viewport.center
-
-    // Create a text node
     const textNode = figma.createText()
 
-    // Set its position to the center of the viewport
     textNode.x = center.x
     textNode.y = center.y
 
-    await figma.loadFontAsync({ family: "Ubuntu Sans", style: "Regular" })
-    textNode.fontName = { family: "Ubuntu Sans", style: "Regular" }
-    // Set font size (in pixels)
-    textNode.fontSize = 16
-
-    // Set line height (in pixels)
+    await figma.loadFontAsync({
+        family: TEXT_STYLES.FONT_FAMILY,
+        style: TEXT_STYLES.FONT_STYLE,
+    })
+    textNode.fontName = {
+        family: TEXT_STYLES.FONT_FAMILY,
+        style: TEXT_STYLES.FONT_STYLE,
+    }
+    textNode.fontSize = TEXT_STYLES.FONT_SIZE
     textNode.lineHeight = {
-        value: 24,
-        unit: "PIXELS",
+        value: TEXT_STYLES.LINE_HEIGHT,
+        unit: TEXT_STYLES.LINE_HEIGHT_UNIT,
     }
 
-    // Return the created node
     return textNode
 }
 
-// Function to handle generating petnames
-async function handlePetnameGeneration(
-    config: Omit<GeneratePetnamesMessage, "type">
-) {
+/**
+ * Handles the generation of pet names for selected text nodes or creates a new text node
+ * @async
+ * @param {PetnameOptions} config - Configuration options for pet name generation
+ * @returns {Promise<void>}
+ */
+async function handlePetnameGeneration(config: PetnameOptions) {
     const selection = figma.currentPage.selection
     let modifiedCount = 0
     let workingNodes: readonly SceneNode[] = []
     let isNewNode = false
 
-    // First check if there are any text nodes selected
     const textNodes = selection.filter((node) => node.type === "TEXT")
 
     if (textNodes.length === 0) {
-        // Create a new text node in the center if none are selected
         const newNode = await createCenteredTextNode()
         workingNodes = [newNode]
         isNewNode = true
@@ -72,45 +65,44 @@ async function handlePetnameGeneration(
         workingNodes = selection
     }
 
-    // Iterate through all nodes
     for (const node of workingNodes) {
-        // Check if the node is a text node
         if (node.type === "TEXT") {
-            // Load the font before modifying text
             await figma.loadFontAsync(node.fontName as FontName)
-
-            // Generate and set the new pet name
-            node.characters = generatePetname({
-                words: config.words,
-                separator: config.separator,
-                letters: config.letters,
-                ubuntu: config.ubuntu,
-            })
+            node.characters = generatePetname(config)
             modifiedCount++
         }
     }
 
-    // Show appropriate notification
     if (isNewNode) {
-        figma.notify("Created new text node with pet name")
+        figma.notify(NOTIFICATION_MESSAGES.NEW_NODE)
     } else if (modifiedCount > 0) {
         figma.notify(
-            `Renamed ${modifiedCount} ${modifiedCount === 1 ? "node" : "nodes"} with pet names`
+            modifiedCount === 1
+                ? NOTIFICATION_MESSAGES.RENAMED_SINGLE
+                : NOTIFICATION_MESSAGES.RENAMED_MULTIPLE(modifiedCount)
         )
     }
 }
 
-// Handle messages from the UI
+/**
+ * Message handler for UI events
+ * @async
+ * @param {unknown} msg - The message received from the UI
+ * @returns {Promise<void>}
+ */
 figma.ui.onmessage = async (msg: unknown) => {
-    if (isGeneratePetnamesMessage(msg)) {
-        // Just generate the names
-        await handlePetnameGeneration(msg)
-    } else if (isGenerateAndCloseMessage(msg)) {
-        // Generate the names and then close
-        await handlePetnameGeneration(msg)
-        figma.closePlugin()
-    } else if (isCloseMessage(msg)) {
-        // Just close the plugin
-        figma.closePlugin()
+    const message = msg as PluginMessage
+
+    switch (message.type) {
+        case MessageType.GENERATE_PETNAMES:
+            await handlePetnameGeneration(message)
+            break
+        case MessageType.GENERATE_AND_CLOSE:
+            await handlePetnameGeneration(message)
+            figma.closePlugin()
+            break
+        case MessageType.CLOSE:
+            figma.closePlugin()
+            break
     }
 }
