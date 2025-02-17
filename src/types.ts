@@ -13,18 +13,18 @@ interface BaseMessage {
     type: MessageType
 }
 
-export interface PetnameOptions {
+export interface PetNameOptions {
     wordCount: number
     wordSeparator: string
     maxWordLength?: number
     startingLetterStyle?: StartingLetterStyle
 }
 
-export interface GeneratePetnamesMessage extends BaseMessage, PetnameOptions {
+export interface GeneratePetNamesMessage extends BaseMessage, PetNameOptions {
     type: MessageType.GENERATE_PETNAMES
 }
 
-export interface GenerateAndCloseMessage extends BaseMessage, PetnameOptions {
+export interface GenerateAndCloseMessage extends BaseMessage, PetNameOptions {
     type: MessageType.GENERATE_AND_CLOSE
 }
 
@@ -33,6 +33,6 @@ export interface CloseMessage extends BaseMessage {
 }
 
 export type PluginMessage =
-    | GeneratePetnamesMessage
+    | GeneratePetNamesMessage
     | GenerateAndCloseMessage
     | CloseMessage

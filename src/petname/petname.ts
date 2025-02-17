@@ -1,4 +1,4 @@
-import { PetnameOptions, StartingLetterStyle } from "../types"
+import { PetNameOptions, StartingLetterStyle } from "../types"
 import { adjectives } from "./data/adjectives"
 import { adverbs } from "./data/adverbs"
 import { names } from "./data/names"
@@ -66,12 +66,12 @@ function getAvailableLetters(
  * @param options.startingLetterStyle - Whether to use Ubuntu-style naming (same starting letter for all words) or random
  * @returns Generated pet name or fallback if filters result in no valid words
  */
-export default function generatePetname({
+export default function generatePetName({
     wordCount,
     wordSeparator,
     maxWordLength,
     startingLetterStyle = StartingLetterStyle.UBUNTU,
-}: PetnameOptions): string {
+}: PetNameOptions): string {
     let petNameComponents: string[] = []
     let availableNames: WordList = [...names]
     let availableAdverbs: WordList = [...adverbs]
@@ -127,11 +127,18 @@ export default function generatePetname({
 
     // Generate name parts based on requested word count
     switch (wordCount) {
+        /* Case 1: Simple name
+         * User wants a single name (e.g., "warthog")
+         */
         case 1: {
             const selectedName = getRandomWord(availableNames)
             if (selectedName) petNameComponents = [selectedName]
             break
         }
+
+        /* Case 2: Adjective + name
+         * User wants a descriptive name (e.g., "warty-warthog")
+         */
         case 2: {
             const selectedAdjective = getRandomWord(availableAdjectives)
             const selectedName = getRandomWord(availableNames)
@@ -139,6 +146,10 @@ export default function generatePetname({
                 petNameComponents = [selectedAdjective, selectedName]
             break
         }
+
+        /* Default (3+ words): Adverbs + adjective + name
+         * User wants a more elaborate name (e.g., "wholly-warty-warthog")
+         */
         default: {
             const numberOfRequiredAdverbs: number = wordCount - 2
             const selectedAdverbs: (string | null)[] = Array(

@@ -4,11 +4,11 @@ import "../styles/index.scss"
 import canonicalLogo from "./canonical.svg"
 
 /**
- * Main application component for the Petname Generator.
+ * Main application component for the PetName Generator.
  * This component allows users to generate pet names with configurable settings
  * such as word count, separator, maximum word length, and starting letter style.
  *
- * @returns {JSX.Element} The rendered Petname Generator interface
+ * @returns {JSX.Element} The rendered PetName Generator interface
  */
 export default function App() {
     const [wordCount, setWordCount] = useState<number>(2)
@@ -30,7 +30,7 @@ export default function App() {
             const value = Math.min(Math.max(1, Number(e.target.value)), 5)
             setWordCount(value)
         },
-        []
+        [setWordCount]
     )
 
     /**
@@ -42,7 +42,7 @@ export default function App() {
         (e: ChangeEvent<HTMLInputElement>): void => {
             setWordSeparator(e.target.value)
         },
-        []
+        [setWordSeparator]
     )
 
     /**
@@ -58,7 +58,7 @@ export default function App() {
                 : undefined
             setMaxWordLength(value)
         },
-        []
+        [setMaxWordLength]
     )
 
     /**
@@ -70,7 +70,7 @@ export default function App() {
         (e: ChangeEvent<HTMLInputElement>): void => {
             setStartingLetterStyle(e.target.value as StartingLetterStyle)
         },
-        []
+        [setStartingLetterStyle]
     )
 
     /**
@@ -119,7 +119,7 @@ export default function App() {
                     alt="Canonical Logo"
                     className="petname-generator__logo"
                 />
-                <h2 className="petname-generator__title">Petname generator</h2>
+                <h2 className="petname-generator__title">Pet name generator</h2>
             </header>
 
             <p>

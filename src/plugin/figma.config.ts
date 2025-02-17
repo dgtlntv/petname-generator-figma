@@ -12,8 +12,8 @@ export const TEXT_STYLES = {
 } as const
 
 export const NOTIFICATION_MESSAGES = {
-    NEW_NODE: "Created new text node with pet name",
-    RENAMED_SINGLE: "Renamed 1 node with pet names",
+    NEW_NODE: () => "Created new text node with pet name",
+    RENAMED_SINGLE: () => "Renamed 1 node with pet names",
     RENAMED_MULTIPLE: (count: number) =>
         `Renamed ${count} nodes with pet names`,
 } as const
