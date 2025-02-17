@@ -1,111 +1,101 @@
-import { Shape } from "@penpot/plugin-types"
-import generatePetname from "../petname/petname"
+import type { Shape } from "@penpot/plugin-types";
+import generatePetName from "../petname/petname.js";
 import {
-    CloseMessage,
-    GenerateAndCloseMessage,
-    GeneratePetnamesMessage,
-} from "../typings/types"
+  MessageType,
+  type PetNameOptions,
+  type PluginMessage,
+} from "../types.js";
+import * as CONFIG from "./penpot.config.js";
 
-// Type guards
-function isGeneratePetnamesMessage(msg: any): msg is GeneratePetnamesMessage {
-    return msg.type === "generate-petnames"
-}
+/**
+ * Initialize and open the plugin window with specified configuration
+ */
+penpot.ui.open(
+  CONFIG.WINDOW_CONFIG.TITLE,
+  CONFIG.WINDOW_CONFIG.THEME_PARAM(penpot.theme),
+  {
+    width: CONFIG.UI_DIMENSIONS.WIDTH,
+    height: CONFIG.UI_DIMENSIONS.HEIGHT,
+  },
+);
 
-function isGenerateAndCloseMessage(msg: any): msg is GenerateAndCloseMessage {
-    return msg.type === "generate-and-close"
-}
-
-function isCloseMessage(msg: any): msg is CloseMessage {
-    return msg.type === "close"
-}
-
-// Show the UI with specified dimensions
-penpot.ui.open("Canonical pet name generator", `?theme=${penpot.theme}`, {
-    width: 450,
-    height: 770,
-})
-
-// Function to create a text node at the center of the viewport
+/**
+ * Creates a new text node at the center of the viewport
+ * @returns {Shape | undefined} The created text node, or undefined if creation fails
+ */
 function createCenteredTextNode() {
-    // Get the viewport information
-    const viewport = penpot.viewport
-    const center = viewport.center
+  const viewport = penpot.viewport;
+  const center = viewport.center;
+  const textNode = penpot.createText(" ");
 
-    // Create a text node
-    const textNode = penpot.createText(" ")
+  if (textNode) {
+    textNode.fontFamily = CONFIG.TEXT_STYLES.FONT_FAMILY;
+    textNode.x = center.x;
+    textNode.y = center.y;
+  }
 
-    // Set Ubuntu Sans as the font if the API supports it
-    if (textNode) {
-        textNode.fontFamily = "Ubuntu Sans"
-        // Set its position to the center of the viewport
-        textNode.x = center.x
-        textNode.y = center.y
-    }
-
-    return textNode
+  return textNode;
 }
 
-// Function to handle generating petnames
-async function handlePetnameGeneration(
-    config: Omit<GeneratePetnamesMessage, "type">
-) {
-    let workingNodes: readonly Shape[] = []
-    let modifiedCount = 0
-    let isNewNode = false
+/**
+ * Handles the generation of pet names for selected or newly created text nodes
+ * @param {PetNameOptions} config - Configuration options for pet name generation
+ * @returns {Promise<void>}
+ */
+async function handlePetNameGeneration(config: PetNameOptions) {
+  let workingNodes: readonly Shape[] = [];
+  let modifiedCount = 0;
+  let isNewNode = false;
 
-    // Check if there are any text nodes selected
-    const textNodes = penpot.selection.filter((node) => node.type === "text")
+  const textNodes = penpot.selection.filter((node) => node.type === "text");
 
-    if (textNodes.length === 0) {
-        // Create a new text node in the center if none are selected
-        const newNode = createCenteredTextNode()
-        if (newNode) {
-            workingNodes = [newNode]
-            isNewNode = true
-        }
-    } else {
-        workingNodes = penpot.selection
+  if (textNodes.length === 0) {
+    const newNode = createCenteredTextNode();
+    if (newNode) {
+      workingNodes = [newNode];
+      isNewNode = true;
     }
+  } else {
+    workingNodes = penpot.selection;
+  }
 
-    // Iterate through all nodes
-    for (const node of workingNodes) {
-        // Check if the node is a text node
-        if (node.type === "text") {
-            // Generate and set the new pet name
-            node.characters = generatePetname({
-                words: config.words,
-                separator: config.separator,
-                letters: config.letters,
-                ubuntu: config.ubuntu,
-            })
-            modifiedCount++
-        }
+  for (const node of workingNodes) {
+    if (node.type === "text") {
+      node.characters = generatePetName(config);
+      modifiedCount++;
     }
+  }
 
-    // We can use console.log for debugging instead of notifications
-    if (isNewNode) {
-        console.log("Created new text node with pet name")
-    } else if (modifiedCount > 0) {
-        console.log(
-            `Renamed ${modifiedCount} ${modifiedCount === 1 ? "node" : "nodes"} with pet names`
-        )
-    }
+  if (isNewNode) {
+    console.log(CONFIG.NOTIFICATION_MESSAGES.NEW_NODE());
+  } else if (modifiedCount > 0) {
+    console.log(
+      modifiedCount === 1
+        ? CONFIG.NOTIFICATION_MESSAGES.RENAMED_SINGLE()
+        : CONFIG.NOTIFICATION_MESSAGES.RENAMED_MULTIPLE(modifiedCount),
+    );
+  }
 }
 
-// Handle messages from the UI
-penpot.ui.onMessage(async (msg: unknown) => {
-    // Extract the plugin message from Penpot's message structure
-    const pluginMessage = (msg as any).pluginMessage
+/**
+ * Message handler for plugin UI interactions
+ * Processes different types of messages and performs corresponding actions
+ * @param {object} msg - The message received from the UI
+ * @returns {Promise<void>}
+ */
+penpot.ui.onMessage(async (msg: { pluginMessage: PluginMessage }) => {
+  const { pluginMessage } = msg;
 
-    if (isGeneratePetnamesMessage(pluginMessage)) {
-        // Just generate the names
-        await handlePetnameGeneration(pluginMessage)
-    } else if (isGenerateAndCloseMessage(pluginMessage)) {
-        // Generate the names and then close
-        await handlePetnameGeneration(pluginMessage)
-        penpot.closePlugin()
-    } else if (isCloseMessage(pluginMessage)) {
-        // Just close the plugin
-        penpot.closePlugin()
-    }
-})
+  switch (pluginMessage.type) {
+    case MessageType.GENERATE_PETNAMES:
+      await handlePetNameGeneration(pluginMessage);
+      break;
+    case MessageType.GENERATE_AND_CLOSE:
+      await handlePetNameGeneration(pluginMessage);
+      penpot.closePlugin();
+      break;
+    case MessageType.CLOSE:
+      penpot.closePlugin();
+      break;
+  }
+});

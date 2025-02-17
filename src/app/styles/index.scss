@@ -3,20 +3,20 @@
 
 .petname-generator {
     &__container {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-        padding-bottom: 1.5rem;
+        padding-left: $sph--large;
+        padding-right: $sph--large;
+        padding-bottom: $spv--large;
     }
 
     &__header {
         display: flex;
         align-items: flex-end;
-        margin-bottom: 1rem;
+        margin-bottom: $spv--small;
     }
 
     &__logo {
         max-width: 2rem;
-        margin-right: 0.5rem;
+        margin-right: $sph--small;
     }
 
     &__title {
@@ -25,7 +25,7 @@
     }
 
     &__form-section {
-        margin: 1.5rem 0;
+        margin: $spv--large 0;
     }
 
     &__footer {

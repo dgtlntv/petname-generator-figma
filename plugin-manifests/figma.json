@@ -1,14 +1,14 @@
 {
-    "name": "Canonical pet name generator",
-    "id": "1464563455928796170",
-    "api": "1.0.0",
-    "main": "./code.js",
-    "ui": "./index.html",
-    "capabilities": [],
-    "enableProposedApi": false,
-    "documentAccess": "dynamic-page",
-    "editorType": ["figma"],
-    "networkAccess": {
-        "allowedDomains": ["https://assets.ubuntu.com"]
-    }
+  "name": "Canonical pet name generator",
+  "id": "1464563455928796170",
+  "api": "1.0.0",
+  "main": "./code.js",
+  "ui": "./index.html",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": ["figma"],
+  "networkAccess": {
+    "allowedDomains": ["https://assets.ubuntu.com"]
+  }
 }
