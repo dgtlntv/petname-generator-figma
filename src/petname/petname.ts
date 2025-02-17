@@ -1,10 +1,10 @@
-import { PetNameOptions, StartingLetterStyle } from "../types"
-import { adjectives } from "./data/adjectives"
-import { adverbs } from "./data/adverbs"
-import { names } from "./data/names"
-import { WordList } from "./types"
+import { type PetNameOptions, StartingLetterStyle } from "../types";
+import { adjectives } from "./data/adjectives";
+import { adverbs } from "./data/adverbs";
+import { names } from "./data/names";
+import type { WordList } from "./types";
 
-const FALLBACK_PET_NAME = "warty-warthog"
+const FALLBACK_PET_NAME = "warty-warthog";
 
 /**
  * Gets a random part from the provided word list
@@ -12,10 +12,10 @@ const FALLBACK_PET_NAME = "warty-warthog"
  * @returns Random word from the array or null if array is empty
  */
 function getRandomWord(wordList: WordList): string | null {
-    if (wordList.length === 0) return null
-    const totalWords: number = wordList.length
-    const randomIndex: number = Math.floor(Math.random() * totalWords)
-    return wordList[randomIndex]
+  if (wordList.length === 0) return null;
+  const totalWords: number = wordList.length;
+  const randomIndex: number = Math.floor(Math.random() * totalWords);
+  return wordList[randomIndex];
 }
 
 /**
@@ -27,34 +27,34 @@ function getRandomWord(wordList: WordList): string | null {
  * @returns Array of valid starting letters
  */
 function getAvailableLetters(
-    adjectives: WordList,
-    adverbs: WordList,
-    names: WordList,
-    wordCount: number
+  adjectives: WordList,
+  adverbs: WordList,
+  names: WordList,
+  wordCount: number,
 ): string[] {
-    // Get unique first letters from each list
-    const nameFirstLetters = new Set(names.map((word) => word[0]))
-    const adjectiveFirstLetters = new Set(adjectives.map((word) => word[0]))
-    const adverbFirstLetters = new Set(adverbs.map((word) => word[0]))
+  // Get unique first letters from each list
+  const nameFirstLetters = new Set(names.map((word) => word[0]));
+  const adjectiveFirstLetters = new Set(adjectives.map((word) => word[0]));
+  const adverbFirstLetters = new Set(adverbs.map((word) => word[0]));
 
-    // Start with name letters as they're always required
-    let validStartingLetters = Array.from(nameFirstLetters)
+  // Start with name letters as they're always required
+  let validStartingLetters = Array.from(nameFirstLetters);
 
-    // Filter by adjective letters if needed (2+ words)
-    if (wordCount >= 2) {
-        validStartingLetters = validStartingLetters.filter((letter) =>
-            adjectiveFirstLetters.has(letter)
-        )
-    }
+  // Filter by adjective letters if needed (2+ words)
+  if (wordCount >= 2) {
+    validStartingLetters = validStartingLetters.filter((letter) =>
+      adjectiveFirstLetters.has(letter),
+    );
+  }
 
-    // Filter by adverb letters if needed (3+ words)
-    if (wordCount > 2) {
-        validStartingLetters = validStartingLetters.filter((letter) =>
-            adverbFirstLetters.has(letter)
-        )
-    }
+  // Filter by adverb letters if needed (3+ words)
+  if (wordCount > 2) {
+    validStartingLetters = validStartingLetters.filter((letter) =>
+      adverbFirstLetters.has(letter),
+    );
+  }
 
-    return validStartingLetters
+  return validStartingLetters;
 }
 
 /**
@@ -67,118 +67,116 @@ function getAvailableLetters(
  * @returns Generated pet name or fallback if filters result in no valid words
  */
 export default function generatePetName({
-    wordCount,
-    wordSeparator,
-    maxWordLength,
-    startingLetterStyle = StartingLetterStyle.UBUNTU,
+  wordCount,
+  wordSeparator,
+  maxWordLength,
+  startingLetterStyle = StartingLetterStyle.UBUNTU,
 }: PetNameOptions): string {
-    let petNameComponents: string[] = []
-    let availableNames: WordList = [...names]
-    let availableAdverbs: WordList = [...adverbs]
-    let availableAdjectives: WordList = [...adjectives]
+  let petNameComponents: string[] = [];
+  let availableNames: WordList = [...names];
+  let availableAdverbs: WordList = [...adverbs];
+  let availableAdjectives: WordList = [...adjectives];
 
-    // Filter by letter length if specified
-    if (maxWordLength !== undefined) {
-        availableAdjectives = availableAdjectives.filter(
-            (word: string): boolean => word.length <= maxWordLength
-        )
-        availableAdverbs = availableAdverbs.filter(
-            (word: string): boolean => word.length <= maxWordLength
-        )
-        availableNames = availableNames.filter(
-            (word: string): boolean => word.length <= maxWordLength
-        )
+  // Filter by letter length if specified
+  if (maxWordLength !== undefined) {
+    availableAdjectives = availableAdjectives.filter(
+      (word: string): boolean => word.length <= maxWordLength,
+    );
+    availableAdverbs = availableAdverbs.filter(
+      (word: string): boolean => word.length <= maxWordLength,
+    );
+    availableNames = availableNames.filter(
+      (word: string): boolean => word.length <= maxWordLength,
+    );
+  }
+
+  // Filter by starting letter for Ubuntu-style names
+  if (startingLetterStyle === StartingLetterStyle.UBUNTU) {
+    const availableStartingLetters = getAvailableLetters(
+      availableAdjectives,
+      availableAdverbs,
+      availableNames,
+      wordCount,
+    );
+    if (availableStartingLetters.length === 0) {
+      return FALLBACK_PET_NAME; // No valid letters available after filtering
     }
 
-    // Filter by starting letter for Ubuntu-style names
-    if (startingLetterStyle === StartingLetterStyle.UBUNTU) {
-        const availableStartingLetters = getAvailableLetters(
-            availableAdjectives,
-            availableAdverbs,
-            availableNames,
-            wordCount
-        )
-        if (availableStartingLetters.length === 0) {
-            return FALLBACK_PET_NAME // No valid letters available after filtering
-        }
+    const selectedStartingLetter =
+      availableStartingLetters[
+        Math.floor(Math.random() * availableStartingLetters.length)
+      ];
 
-        const selectedStartingLetter =
-            availableStartingLetters[
-                Math.floor(Math.random() * availableStartingLetters.length)
-            ]
+    availableAdjectives = availableAdjectives.filter((word: string): boolean =>
+      word.startsWith(selectedStartingLetter),
+    );
 
-        availableAdjectives = availableAdjectives.filter(
-            (word: string): boolean => word.startsWith(selectedStartingLetter)
-        )
+    availableAdverbs = availableAdverbs.filter((word: string): boolean =>
+      word.startsWith(selectedStartingLetter),
+    );
 
-        availableAdverbs = availableAdverbs.filter((word: string): boolean =>
-            word.startsWith(selectedStartingLetter)
-        )
+    availableNames = availableNames.filter((word: string): boolean =>
+      word.startsWith(selectedStartingLetter),
+    );
+  }
 
-        availableNames = availableNames.filter((word: string): boolean =>
-            word.startsWith(selectedStartingLetter)
-        )
+  // Ensure minimum of 1 word
+  if (wordCount <= 0) {
+    wordCount = 1;
+  }
+
+  // Generate name parts based on requested word count
+  switch (wordCount) {
+    /* Case 1: Simple name
+     * User wants a single name (e.g., "warthog")
+     */
+    case 1: {
+      const selectedName = getRandomWord(availableNames);
+      if (selectedName) petNameComponents = [selectedName];
+      break;
     }
 
-    // Ensure minimum of 1 word
-    if (wordCount <= 0) {
-        wordCount = 1
+    /* Case 2: Adjective + name
+     * User wants a descriptive name (e.g., "warty-warthog")
+     */
+    case 2: {
+      const selectedAdjective = getRandomWord(availableAdjectives);
+      const selectedName = getRandomWord(availableNames);
+      if (selectedAdjective && selectedName)
+        petNameComponents = [selectedAdjective, selectedName];
+      break;
     }
 
-    // Generate name parts based on requested word count
-    switch (wordCount) {
-        /* Case 1: Simple name
-         * User wants a single name (e.g., "warthog")
-         */
-        case 1: {
-            const selectedName = getRandomWord(availableNames)
-            if (selectedName) petNameComponents = [selectedName]
-            break
-        }
+    /* Default (3+ words): Adverbs + adjective + name
+     * User wants a more elaborate name (e.g., "wholly-warty-warthog")
+     */
+    default: {
+      const numberOfRequiredAdverbs: number = wordCount - 2;
+      const selectedAdverbs: (string | null)[] = Array(numberOfRequiredAdverbs)
+        .fill("")
+        .map((): string | null => getRandomWord(availableAdverbs));
 
-        /* Case 2: Adjective + name
-         * User wants a descriptive name (e.g., "warty-warthog")
-         */
-        case 2: {
-            const selectedAdjective = getRandomWord(availableAdjectives)
-            const selectedName = getRandomWord(availableNames)
-            if (selectedAdjective && selectedName)
-                petNameComponents = [selectedAdjective, selectedName]
-            break
-        }
+      const selectedAdjective = getRandomWord(availableAdjectives);
+      const selectedName = getRandomWord(availableNames);
 
-        /* Default (3+ words): Adverbs + adjective + name
-         * User wants a more elaborate name (e.g., "wholly-warty-warthog")
-         */
-        default: {
-            const numberOfRequiredAdverbs: number = wordCount - 2
-            const selectedAdverbs: (string | null)[] = Array(
-                numberOfRequiredAdverbs
-            )
-                .fill("")
-                .map((): string | null => getRandomWord(availableAdverbs))
-
-            const selectedAdjective = getRandomWord(availableAdjectives)
-            const selectedName = getRandomWord(availableNames)
-
-            if (
-                selectedAdjective &&
-                selectedName &&
-                !selectedAdverbs.includes(null)
-            ) {
-                petNameComponents = [
-                    ...(selectedAdverbs as string[]),
-                    selectedAdjective,
-                    selectedName,
-                ]
-            }
-        }
+      if (
+        selectedAdjective &&
+        selectedName &&
+        !selectedAdverbs.includes(null)
+      ) {
+        petNameComponents = [
+          ...(selectedAdverbs as string[]),
+          selectedAdjective,
+          selectedName,
+        ];
+      }
     }
+  }
 
-    // Return fallback if we couldn't generate valid parts
-    if (petNameComponents.length === 0) {
-        return FALLBACK_PET_NAME
-    }
+  // Return fallback if we couldn't generate valid parts
+  if (petNameComponents.length === 0) {
+    return FALLBACK_PET_NAME;
+  }
 
-    return petNameComponents.join(wordSeparator)
+  return petNameComponents.join(wordSeparator);
 }
