@@ -5,7 +5,6 @@ import {
   StartingLetterStyle,
 } from "../../types.js";
 import "../styles/index.scss";
-import canonicalLogo from "./canonical.svg";
 
 /**
  * Main application component for the PetName Generator.
@@ -118,15 +117,12 @@ export default function App() {
   return (
     <div className="petname-generator__container">
       <header className="petname-generator__header">
-        <img
-          src={canonicalLogo}
-          alt="Canonical Logo"
-          className="petname-generator__logo"
-        />
         <h2 className="petname-generator__title">Pet name generator</h2>
       </header>
 
-      <p>Select text nodes, configure the settings below and click generate.</p>
+      <p>
+        Select text layers, configure the settings below and click generate.
+      </p>
 
       <div className="petname-generator__form-section">
         <div>

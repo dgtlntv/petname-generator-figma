@@ -1,5 +1,5 @@
 {
-  "name": "petname-generator-figma",
+  "name": "petname-generator-plugin-figma-penpot",
   "version": "1.0.0",
   "description": "This plugin generates Ubuntu style pet names for each selected text node in Figma.",
   "license": "GPL-3.0",

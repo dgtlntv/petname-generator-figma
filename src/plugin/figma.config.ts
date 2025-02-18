@@ -1,6 +1,6 @@
 export const UI_DIMENSIONS = {
   WIDTH: 450,
-  HEIGHT: 720,
+  HEIGHT: 680,
 } as const;
 
 export const TEXT_STYLES = {

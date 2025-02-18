@@ -1,9 +1,9 @@
-import purgecss from "@fullhuman/postcss-purgecss"
-import react from "@vitejs/plugin-react"
-import fs from "fs"
-import path from "path"
-import { defineConfig, Plugin, UserConfig } from "vite"
-import { viteSingleFile } from "vite-plugin-singlefile"
+import { purgeCSSPlugin } from "@fullhuman/postcss-purgecss";
+import react from "@vitejs/plugin-react";
+import fs from "fs";
+import path from "path";
+import { defineConfig, Plugin, UserConfig } from "vite";
+import { viteSingleFile } from "vite-plugin-singlefile";
 
 // Shared configuration
 const sharedConfig: UserConfig = {
@@ -23,7 +23,7 @@ const sharedConfig: UserConfig = {
         },
         postcss: {
             plugins: [
-                purgecss({
+                purgeCSSPlugin({
                     content: [
                         "./src/**/*.html",
                         "./src/**/*.tsx",
