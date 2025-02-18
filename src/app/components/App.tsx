@@ -156,7 +156,7 @@ export default function App() {
         </div>
 
         <div>
-          <label htmlFor="letters">Max. word length</label>
+          <label htmlFor="letters">Max. word length in characters</label>
           <input
             type="number"
             id="letters"
